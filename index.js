@@ -46,6 +46,20 @@ app.get('/getEntries', (req, res) => {
         `Entries at indices [${startIndex}, ${endIndex}): ${JSON.stringify(entries)}`);
 });
 
+app.post('/initializeFssAggMAC', (req, res) => {
+    const key = req.body;
+    const startIndex = log.initFssAggMAC(key, 'FssAggMAC initialized');
+    res.status(200).send(
+        `FssAgg MAC initialized, starting from entry: ${startIndex}`);
+});
+
+app.get('/gettFssAggMAC', (req, res) => {
+    const [MAC, numEvolvements] = log.getFssAggMAC();
+    res.status(200).send(
+        `FssAggMAC: ${MAC}, number of evolvements: ${numEvolvements}`
+    );
+});
+
 app.listen(process.env.PORT, () =>
   console.log(`Example app listening on port ${process.env.PORT}!`),
 );

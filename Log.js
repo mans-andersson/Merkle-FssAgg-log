@@ -1,10 +1,33 @@
 const { MerkleTree } = require('merkletreejs')
 const SHA256 = require('crypto-js/sha256')
+const fssagg = require('./FssAggMAC');
 
 class Log {
     constructor() {
         this.tree = new MerkleTree([], SHA256);
         this.dataStorage = [];
+        this.numEntries = 0;
+    }
+
+    /**
+     * Creates a new FssAggMAC on the log
+     * @param {string} initialSecret the initial secret key sk_0
+     * @param {string} initialMessage an init message, should contain info about the MAC being initialized
+     * @returns index of the first entry that is validated by the new FssAggMAC
+     */
+    initFssAggMAC(initialSecret, initialMessage) {
+        this.fssAggMAC = new fssagg.FssAggMAC(initialSecret);
+        const index = this.numEntries;
+        this.addEntry(initialMessage);
+        return index;
+    }
+
+    /**
+     * 
+     * @returns the current FssAgg MAC
+     */
+    getFssAggMAC() {
+        return this.fssAggMAC;
     }
 
     /**
@@ -14,7 +37,11 @@ class Log {
      */
     addEntry(entry) {
         this.tree.addLeaf(SHA256(entry));
+        if (this.fssAggMAC) {
+            this.fssAggMAC.aSig(entry);
+        }
         this.dataStorage.push(entry);
+        this.numEntries++;
         return this.tree.getRoot();
     }
 
@@ -49,12 +76,17 @@ class Log {
 
     /**
      * Get a range of log entries from startIndex (inclusive) to endIndex (exclusive)
+     * If endIndex is not defined all elements from startIndex to the end of the log are returned
      * @param {int} startIndex 
-     * @param {int} endIndex 
+     * @param {int} (optional) endIndex 
      * @returns An array of log entries
      */
-    getEntries(startIndex, endIndex) {
-        return this.dataStorage.slice(startIndex, endIndex);
+    getEntries(startIndex, endIndex = undefined) {
+        if (endIndex) {
+            return this.dataStorage.slice(startIndex, endIndex);
+        } else {
+            return this.dataStorage.slice(startIndex);
+        }
     }
 
     /**

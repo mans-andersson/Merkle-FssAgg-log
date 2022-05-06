@@ -22,7 +22,6 @@ class FssAggMAC {
     }
 
     /**
-     * 
      * @returns the FssAgg MAC
      */
     getMAC() {
@@ -30,11 +29,17 @@ class FssAggMAC {
     }
 
     /**
-     * 
      * @returns the number of evolvements of the FssAggMAC
      */
     getNumEvolvements() {
         return this.numEvolvements;
+    }
+
+    /**
+     * @returns the current FssAgg MAC and the number of evolvements of the MAC
+     */
+    getMACAndNumEvolvements() {
+        return [this.getMAC(), this.getNumEvolvements()];
     }
 }
 

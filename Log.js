@@ -24,10 +24,10 @@ class Log {
 
     /**
      * 
-     * @returns the current FssAgg MAC
+     * @returns the current FssAgg MAC and the number of evolvements
      */
     getFssAggMAC() {
-        return this.fssAggMAC;
+        return this.fssAggMAC.getMACAndNumEvolvements();
     }
 
     /**

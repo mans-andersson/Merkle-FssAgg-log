@@ -4,6 +4,7 @@
 
 const axios = require('axios');
 const { MerkleTree } = require('merkletreejs')
+const FssAggMAC = require('./FssAggMAC');
 const SHA256 = require('crypto-js/sha256');
 require('dotenv').config()
 
@@ -152,6 +153,19 @@ function verifyProof(root, entry, proofJSONString) {
     return tree.verify(proof, entryHash, root);
 }
 
+/**
+ * Check if an FssAgg MAC verifies a list of entries with an initial secret
+ * Optionally specify an FssAggMAC to start from
+ * @param {string} MAC
+ * @param {[string]} entries
+ * @param {string} secret
+ * @param {string} startingMAC (optional)
+ * @returns FssAggMAC valid status (boolean)
+ */
+function verifyFssAggMAC(MAC, entries, secret, startingMAC = undefined) {
+    return FssAggMAC.verifyFssAggMAC(MAC, entries, secret, startingMAC);
+}
+
 module.exports = { 
     addEntry, 
     getProofByIndex,
@@ -162,5 +176,6 @@ module.exports = {
     initializeFssAggMAC,
     getFssAggMAC,
     getRoot,
-    verifyProof
+    verifyProof,
+    verifyFssAggMAC
  };

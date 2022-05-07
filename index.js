@@ -16,8 +16,31 @@ app.post('/addEntry', (req, res) => {
     const entry = JSON.stringify(req.body);
     const root = log.addEntry(entry);
     console.log('Entry added successfully:', entry, 'root:', root.toString('hex'));
-    return res.status(200).send('Entry added successfully: ' + log.getRoot().toString('hex'))
+    return res.status(200).send(
+        JSON.stringify({
+            root: root.toString('hex')}));
 });
+
+app.get('/getProofByIndex', (req, res) => {
+    const index = req.query.index;
+    const proof = log.getProofByIndex(index);
+    console.log(`Proof for entry ${index}: ${proof}`);
+    return res.status(200).send(
+        JSON.stringify({
+            index: index,
+            proof: JSON.stringify(proof)
+    }));
+})
+
+app.get('/getProofByEntry', (req, res) => {
+    const entry = req.query.entry;
+    const proof = log.getProofByEntry(entry);
+    return res.status(200).send(
+        JSON.stringify({
+            entry: entry,
+            proof: JSON.stringify(proof)
+    }));
+})
 
 app.post('/addEntryAndGetProof', (req, res) => {
     const entry = JSON.stringify(req.body);
@@ -25,41 +48,62 @@ app.post('/addEntryAndGetProof', (req, res) => {
     console.log('Entry added successfully:', entry, 'root:', root.toString('hex'));
     console.log('Membership proof:', proof);
     return res.status(200).send(
-        `Entry added successfully\n
-        root: ${root.toString('hex')}\n
-        proof: ${JSON.stringify(proof)}\n`
-    )
+        JSON.stringify({
+            root: root.toString('hex'),
+            proof: JSON.stringify(proof)
+    }));
 });
 
 app.get('/getEntry', (req, res) => {
     const index = req.query.index;
     const entry = log.getEntry(index);
-    res.status(200).send(
-        `Entry at index ${index}: ${JSON.stringify(entry)}`);
+    return res.status(200).send(
+        JSON.stringify({
+            index: index,
+            entry: entry
+    }));
 });
 
 app.get('/getEntries', (req, res) => {
     const startIndex = req.query.startIndex;
     const endIndex = req.query.endIndex;
-    const entries = log.getEntries(endIndex);
-    res.status(200).send(
-        `Entries at indices [${startIndex}, ${endIndex}): ${JSON.stringify(entries)}`);
+    const entries = log.getEntries(startIndex, endIndex);
+    return res.status(200).send(
+        JSON.stringify({
+            startIndex: startIndex,
+            endIndex: endIndex,
+            entries: entries
+    }));
 });
+
+app.get('/getRoot', (req, res) => {
+    const root = log.getRoot().toString('hex');
+    return res.status(200).send(
+        JSON.stringify({
+            root: root
+    }));
+})
 
 app.post('/initializeFssAggMAC', (req, res) => {
-    const key = req.body;
+    const key = req.body.key;
     const startIndex = log.initFssAggMAC(key, 'FssAggMAC initialized');
-    res.status(200).send(
-        `FssAgg MAC initialized, starting from entry: ${startIndex}`);
+    return res.status(200).send(
+        JSON.stringify({
+            status: "success",
+            startIndex: startIndex
+    }));
 });
 
-app.get('/gettFssAggMAC', (req, res) => {
+app.get('/getFssAggMAC', (req, res) => {
     const [MAC, numEvolvements] = log.getFssAggMAC();
-    res.status(200).send(
-        `FssAggMAC: ${MAC}, number of evolvements: ${numEvolvements}`
-    );
+    console.log(MAC, numEvolvements);
+    return res.status(200).send(
+        JSON.stringify({
+            fssAggMAC: MAC,
+            numEvolvements: numEvolvements
+    }));
 });
 
-app.listen(process.env.PORT, () =>
-  console.log(`Example app listening on port ${process.env.PORT}!`),
+app.listen(process.env.LOGGER_PORT, () =>
+  console.log(`Example app listening on port ${process.env.LOGGER_PORT}!`),
 );

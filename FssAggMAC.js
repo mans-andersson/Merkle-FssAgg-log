@@ -1,5 +1,5 @@
 const crypto    = require('crypto');
-const SHA256 = require('crypto-js/sha256')
+const SHA256 = require('crypto-js/sha256');
 
 class FssAggMAC {
     constructor(secretKey) {

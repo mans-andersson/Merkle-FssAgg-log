@@ -15,7 +15,6 @@ require('dotenv').config()
  */
 async function addEntry(data) {
     const res = await axios.post(`${process.env.LOGGER_URL}/addEntry`, data);
-    console.log(res.data);
     return res;
 }
 
@@ -30,7 +29,6 @@ async function getProofByIndex(index) {
             index: index
         }
     });
-    console.log(res.data);
     return res;
 }
 
@@ -45,7 +43,6 @@ async function getProofByEntry(entry) {
             entry: entry
         }
     });
-    console.log(res.data);
     return res;
 }
 
@@ -56,7 +53,6 @@ async function getProofByEntry(entry) {
  */
 async function addEntryAndGetProof(data) {
     const res = await axios.post(`${process.env.LOGGER_URL}/addEntryAndGetProof`, data);
-    console.log(res.data);
     return res;
 }
 
@@ -71,7 +67,6 @@ async function getEntry(index) {
             index: index
         }
     });
-    console.log(res.data);
     return res;
 }
 
@@ -89,7 +84,6 @@ async function getEntries(startIndex, endIndex = undefined) {
             endIndex: endIndex 
         }
     });
-    console.log(res.data);
     return res;
 }
 
@@ -102,7 +96,6 @@ async function initializeFssAggMAC(secretKey) {
     const res = await axios.post(`${process.env.LOGGER_URL}/initializeFssAggMAC`, 
         {key: secretKey}
     );
-    console.log(res.data);
     return res;
 }
 
@@ -112,7 +105,6 @@ async function initializeFssAggMAC(secretKey) {
  */
 async function getFssAggMAC() {
     const res = await axios.get(`${process.env.LOGGER_URL}/getFssAggMAC`);
-    console.log(res.data);
     return res;
 }
 
@@ -122,7 +114,6 @@ async function getFssAggMAC() {
  */
 async function getRoot() {
     const res = await axios.get(`${process.env.LOGGER_URL}/getRoot`);
-    console.log(res.data);
     return res;
 }
 

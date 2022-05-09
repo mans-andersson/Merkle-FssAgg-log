@@ -20,6 +20,7 @@ The server exposes the following API.
 
 ## Interacting with the log
 In `Client.js` functions are defined that a client or auditor can use to interact with the log. Since the log is available via http endpoints one could easily define similar functions in other languages as well. Below is an example of how one may interact with the logger.
+The URL of the log server should be specified in `.env` using LOGGER_URL.
 
 ```javascript
 const Client = require('./Client');

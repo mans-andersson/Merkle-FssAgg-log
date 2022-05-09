@@ -15,6 +15,7 @@ app.use('/*', (req, _, next) => {
 /**
  * Endpoints for adding new log entry
  * Post request, expects entry data as post request body
+ * The log entry is expected to be in JSON format
  * Responds with new merkle tree root upon succesful entry addition (as a JSON string)
  */
 app.post('/addEntry', (req, res) => {
@@ -60,6 +61,7 @@ app.get('/getProofByEntry', (req, res) => {
 /**
  * Endpoint for adding a new entry and requesting a membership proof for it
  * Expects the entry (string) as the body of the POST request
+ * The log entry is expected to be in JSON format
  * Responnds with the root of the updated merkle tree and the membership proof (as a JSON string)
  */
 app.post('/addEntryAndGetProof', (req, res) => {

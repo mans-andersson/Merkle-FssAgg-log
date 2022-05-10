@@ -2,7 +2,16 @@ const { Log } = require('./Log');
 const express = require('express');
 require('dotenv').config()
 
-const log = new Log();
+let log = undefined;
+if (process.env.PRIVATE_KEY) {
+    const fs = require('fs');
+    const { createPrivateKey } = require('crypto');
+    const privateKeyString = fs.readFileSync(process.env.PRIVATE_KEY);
+    const privateKey = createPrivateKey(privateKeyString);
+    log = new Log(privateKey);
+} else {
+    log = new Log();
+}
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -16,15 +25,14 @@ app.use('/*', (req, _, next) => {
  * Endpoints for adding new log entry
  * Post request, expects entry data as post request body
  * The log entry is expected to be in JSON format
- * Responds with new merkle tree root upon succesful entry addition (as a JSON string)
+ * Responds with the newly generated commitment
  */
 app.post('/addEntry', (req, res) => {
     const entry = JSON.stringify(req.body);
-    const root = log.addEntry(entry);
-    console.log('Entry added successfully:', entry, 'root:', root.toString('hex'));
+    const commitment = log.addEntry(entry);
+    console.log('Entry added successfully:', entry, 'commitment:', commitment);
     return res.status(200).send(
-        JSON.stringify({
-            root: root.toString('hex')}));
+        JSON.stringify({commitment: commitment}));
 });
 
 /**
@@ -62,16 +70,16 @@ app.get('/getProofByEntry', (req, res) => {
  * Endpoint for adding a new entry and requesting a membership proof for it
  * Expects the entry (string) as the body of the POST request
  * The log entry is expected to be in JSON format
- * Responnds with the root of the updated merkle tree and the membership proof (as a JSON string)
+ * Responnds with the newly generated commitment and the membership proof (as a JSON string)
  */
 app.post('/addEntryAndGetProof', (req, res) => {
     const entry = JSON.stringify(req.body);
-    const [root, proof] = log.addEntryAndGetProof(entry);
-    console.log('Entry added successfully:', entry, 'root:', root.toString('hex'));
+    const [commitment, proof] = log.addEntryAndGetProof(entry);
+    console.log('Entry added successfully:', entry, 'commitment:', commitment);
     console.log('Membership proof:', proof);
     return res.status(200).send(
         JSON.stringify({
-            root: root.toString('hex'),
+            commitment: commitment,
             proof: JSON.stringify(proof)
     }));
 });

@@ -25,6 +25,9 @@ The URL of the log server should be specified in `.env` using LOGGER_URL.
 ```javascript
 const Client = require('./Client');
 const FssAggMAC = require('./FssAggMAC');
+const fs = require('fs');
+const loggerPublicKey = crypto.createPublicKey(
+    fs.readFileSync(process.env.LOGGER_PUBLIC_KEY));
 await Client.addEntry({a: 1});
 await Client.addEntry({b: 2});
 await Client.addEntry({c: 3});
@@ -32,8 +35,11 @@ let res = await Client.getEntries(1);
 // Should print [{b: 2}, {c: 3}]
 console.log(res.data.entries);
 res = await Client.addEntryAndGetProof({d: 4});
-let root = res.data.root;
+let commitment = res.data.commitment;
+let root = commitment.root;
 let proof = res.data.proof;
+// Should print true
+console.log(Client.verifyCommitment(loggerPublicKey, commitment));
 // Should print true
 console.log(Client.verifyProof(root, JSON.stringify({d: 4}), proof));
 // Should print false (wrong entry)

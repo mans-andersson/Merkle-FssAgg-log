@@ -1,12 +1,17 @@
 const { MerkleTree } = require('merkletreejs')
 const SHA256 = require('crypto-js/sha256')
+const crypto = require('crypto');
 const fssagg = require('./FssAggMAC');
 
 class Log {
-    constructor() {
+    constructor(privateKey = undefined) {
         this.tree = new MerkleTree([], SHA256);
         this.dataStorage = [];
         this.numEntries = 0;
+        if (privateKey) {
+            this.signingEnabled = true;
+            this.privateKey = privateKey;
+        }
     }
 
     /**
@@ -42,7 +47,35 @@ class Log {
         }
         this.dataStorage.push(entry);
         this.numEntries++;
-        return this.tree.getRoot();
+        this.computeCommitment();
+        return this.currentCommitment;
+    }
+
+    /**
+     * Computes and updates this.commitment based on the private key,
+     * the current root and number of entries added to the log
+     * @returns the updated commitment
+     */
+    computeCommitment() {
+        let root = this.tree.getRoot().toString('hex');
+        let index = this.numEntries;
+        let commitment = {root: root, index: index};
+        if (this.signingEnabled) {
+            const sign = crypto.createSign('SHA256');
+            sign.write(root + index);
+            sign.end();
+            const signature = sign.sign(this.privateKey, 'hex');
+            commitment['signature'] = signature;
+        }
+        this.currentCommitment = commitment;
+        return commitment;
+    }
+
+    /**
+     * @returns the current commitment (if signing is enabled, otherwise undefined)
+     */
+    getCommitment() {
+        return this.currentCommitment;
     }
 
     /**
@@ -107,14 +140,15 @@ class Log {
     }
 
     /**
-     * Add a new entry and get a membership proof for the just added entry, also returns the root hash
+     * Add a new entry and get a membership proof for the just added entry,
+     * also returns the newly generated commitment
      * @param {string} entry 
-     * @returns [root, proof]
+     * @returns [commitment, proof]
      */
     addEntryAndGetProof(entry) {
-        const root = this.addEntry(entry);
+        const commitment = this.addEntry(entry);
         const proof = this.getProofByEntry(entry);
-        return [root, proof];
+        return [commitment, proof];
     }
 }
 

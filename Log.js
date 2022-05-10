@@ -4,6 +4,11 @@ const crypto = require('crypto');
 const fssagg = require('./FssAggMAC');
 
 class Log {
+    /**
+     * Initialize a log
+     * If privateKey is provided commitment signing will be enabled
+     * @param {KeyObject} privateKey 
+     */
     constructor(privateKey = undefined) {
         this.tree = new MerkleTree([], SHA256);
         this.dataStorage = [];

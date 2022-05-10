@@ -3,6 +3,7 @@
  */
 
 const axios = require('axios');
+const crypto = require('crypto');
 const { MerkleTree } = require('merkletreejs')
 const FssAggMAC = require('./FssAggMAC');
 const SHA256 = require('crypto-js/sha256');
@@ -130,6 +131,17 @@ function proofJSONtoMerkleProof(proofJSONString) {
 }
 
 /**
+ * Checks if a commitment is valid based on the loggers public key
+ * @returns boolean
+ */
+function verifyCommitment(publicKey, commitment) {
+    const verify = crypto.createVerify('SHA256');
+    verify.write(commitment.root + commitment.index);
+    verify.end();
+    return verify.verify(publicKey, commitment.signature, 'hex');
+}
+
+/**
  * Checks a merkle tree membership proof for the specified
  * root, entry and proof string
  * @param {string} root 
@@ -167,6 +179,7 @@ module.exports = {
     initializeFssAggMAC,
     getFssAggMAC,
     getRoot,
+    verifyCommitment,
     verifyProof,
-    verifyFssAggMAC
+    verifyFssAggMAC,
  };

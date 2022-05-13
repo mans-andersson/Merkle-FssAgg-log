@@ -118,14 +118,14 @@ app.get('/getEntries', (req, res) => {
 });
 
 /**
- * Endpoint for retrieving the most recent merkle tree root hash from the log
- * Responds with the root hash (as a JSON string)
+ * Endpoint for retrieving the most recent commitment from the log
+ * Responds with the current commitment (as a JSON string)
  */
-app.get('/getRoot', (req, res) => {
-    const root = log.getRoot().toString('hex');
+app.get('/getCommitment', (req, res) => {
+    const commitment = log.getCommitment();
     return res.status(200).send(
         JSON.stringify({
-            root: root
+            commitment: commitment
     }));
 })
 

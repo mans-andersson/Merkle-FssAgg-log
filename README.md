@@ -14,7 +14,7 @@ The server exposes the following API.
 - `/addEntryAndGetProof`
 - `/getEntry`
 - `/getEntries`
-- `/getRoot`
+- `/getCommitment`
 - `/initializeFssAggMAC`
 - `/getFssAggMAC`
 

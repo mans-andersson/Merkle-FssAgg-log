@@ -1,5 +1,5 @@
-const { MerkleTree } = require('merkletreejs')
-const SHA256 = require('crypto-js/sha256')
+const { MerkleTree } = require('merkletreejs');
+const SHA256 = require('crypto-js/sha256');
 const crypto = require('crypto');
 const fssagg = require('./FssAggMAC');
 

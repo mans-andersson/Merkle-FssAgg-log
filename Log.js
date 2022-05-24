@@ -46,7 +46,7 @@ class Log {
      * @returns The new tree root
      */
     addEntry(entry) {
-        this.tree.addLeaf(SHA256(entry));
+        this.tree.addLeafDynamic(SHA256(entry));
         if (this.fssAggMAC) {
             this.fssAggMAC.aSig(entry);
         }

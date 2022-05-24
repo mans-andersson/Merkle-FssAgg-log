@@ -160,7 +160,7 @@ function verifyProof(root, entry, proofJSONString) {
  * Check if an FssAgg MAC verifies a list of entries with an initial secret
  * Optionally specify an FssAggMAC to start from
  * @param {string} MAC
- * @param {[string]} entries
+ * @param {Array.<string>} entries
  * @param {string} secret
  * @param {string} startingMAC (optional)
  * @returns FssAggMAC valid status (boolean)

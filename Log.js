@@ -1,7 +1,10 @@
+"use strict";
+
 const { MerkleTree } = require('merkletreejs');
 const SHA256 = require('crypto-js/sha256');
 const crypto = require('crypto');
 const fssagg = require('./FssAggMAC');
+const { strict } = require('assert');
 
 class Log {
     /**
@@ -13,6 +16,7 @@ class Log {
         this.tree = new MerkleTree([], SHA256);
         this.dataStorage = [];
         this.numEntries = 0;
+        this.commitment = undefined;
         if (privateKey) {
             this.signingEnabled = true;
             this.privateKey = privateKey;
@@ -53,7 +57,6 @@ class Log {
         this.dataStorage.push(entry);
         this.numEntries++;
         this.computeCommitment();
-        return this.currentCommitment;
     }
 
     /**
@@ -64,23 +67,22 @@ class Log {
     computeCommitment() {
         let root = this.tree.getRoot().toString('hex');
         let index = this.numEntries;
-        let commitment = {root: root, index: index};
+        let commitment = {root: root, index: index, signature: undefined};
         if (this.signingEnabled) {
             const sign = crypto.createSign('SHA256');
-            sign.write(root + index);
+            sign.update(Buffer.from(root + index, "utf-8"));
             sign.end();
             const signature = sign.sign(this.privateKey, 'hex');
-            commitment['signature'] = signature;
+            commitment.signature = { ...signature };
         }
-        this.currentCommitment = commitment;
-        return commitment;
+        this.commitment = commitment;
     }
 
     /**
      * @returns the current commitment (if signing is enabled, otherwise undefined)
      */
     getCommitment() {
-        return this.currentCommitment;
+        return this.commitment;
     }
 
     /**
